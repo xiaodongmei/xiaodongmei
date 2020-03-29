@@ -3,13 +3,11 @@
 1.链表的逆置
 2.从尾到头打印链表
 3.判断链表是否有环
-4.找链表中的第k个节点
-6.寻找两个链表的第一个公共节点
-5.合并两个有序的链表
-5.将一颗二叉排序树转成一个有序的双向链表
-
-
+4.找链表中的倒数第k个节点
+5.寻找两个链表的第一个公共节点
+6.合并两个有序的链表
 */
+
 #include <iostream>
 #include <vector>
 #include <stack>
@@ -169,10 +167,48 @@ ListNode * SetCircle(ListNode * phead)
 }
 //寻找两个链表的第一个公共节点
 /*
-思路：
-
-
+思路：如果两个链表有公共节点，说明他们相交了，且程'Y'字型，如果我们从后往前找的话，找到第一个开始
+不相同的节点的前一个节点则这就是他们的第一个公共节点，但是链表没有前驱指针
+所以可以换种思路，如果知道链表的长度差m，让长的那个链表先走m步，然后两个链表再同时走，在走的
+过程中进行比较，如果节点相同，则这为他们的第一个公共节点
 */
+
+ListNode * FindFirstCommonNode(ListNode *phead1, ListNode *phead2)
+{
+    if(phead1 == NULL || phead2 == NULL)
+        return NULL;
+    int lenth1 = GetListLenth(phead1);
+    int lenth2 = GetListLenth(phead2);
+    int diff_lenth = lenth1>lenth2 ? lenth1-lenth2: lenth2-lenth1;
+    ListNode * comm_node = NULL;
+    ListNode *p1 = phead1;
+    ListNode *p2 = phead2;
+    if(lenth1 > lenth2)
+    {
+        for(int i=0; i <diff_lenth; ++i)
+        {
+            p1 = p1->p_next;
+        }
+    }
+    else
+    {
+        for(int i=0; i <diff_lenth; ++i)
+        {
+            p2 = p2->p_next;
+        }
+    }
+    while (p1 != NULL && p2!=NULL)
+    {
+        if(p1 == p2)
+        {
+            comm_node = p1;
+            break;
+        }
+        p1 = p1->p_next;
+        p2 = p2->p_next;
+    }
+    return comm_node;    
+}
 
 
 //合并两个有序的链表
@@ -230,6 +266,32 @@ ListNode * MergeList(ListNode *phead1, ListNode *phead2)
     }
     
     return pnew_head;
+}
+
+//合并两个有序链表递归解法
+/*
+思路：首先，合并两个链表几乎所做的操作就是两个链表节点比较，如果谁的值小，
+谁就是我合并链表的下一个节点，这是一个可递归的操作
+*/
+
+ListNode * MergeList2(ListNode *phead1, ListNode *phead2)
+{
+    if(phead1 == NULL)
+        return phead2;
+    if(phead2 == NULL)
+        return phead1;
+    ListNode *pnew_head = NULL;
+    if(phead1->value < phead2->value)
+    {
+        pnew_head = phead1;
+        pnew_head->p_next = MergeList2(phead1->p_next,phead2);
+    }
+    else
+    {
+        pnew_head = phead2;
+        pnew_head->p_next = MergeList2(phead1,phead2->p_next);
+    }
+    return pnew_head;   
 }
 
 //将一颗二叉排序树转成一个有序的双向链表
